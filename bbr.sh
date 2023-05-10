@@ -42,9 +42,9 @@ sed -i '/net.ipv4.tcp_thin_linear_timeouts/d' /etc/sysctl.conf
 sed -i '/net.ipv4.tcp_fastopen/d' /etc/sysctl.conf
 sed -i '/kernel.printk/d' /etc/sysctl.conf
 sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
-sed -i 'net.ipv6.conf.all.disable_ipv6/d' /etc/sysctl.conf
-sed -i 'net.ipv6.conf.default.disable_ipv6/d' /etc/sysctl.conf
-sed -i 'net.ipv6.conf.lo.disable_ipv6/d' /etc/sysctl.conf
+sed -i '/net.ipv6.conf.all.disable_ipv6/d' /etc/sysctl.conf
+sed -i '/net.ipv6.conf.default.disable_ipv6/d' /etc/sysctl.conf
+sed -i '/net.ipv6.conf.lo.disable_ipv6/d' /etc/sysctl.conf
 cat >> /etc/sysctl.conf << EOF
 #!!! Do not change these settings unless you know what you are doing !!!
 vm.swappiness = 10
