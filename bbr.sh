@@ -179,6 +179,108 @@ sleep 2s
 menu
 }
 
+check_version(){
+    if [[ -s /etc/redhat-release ]]; then
+        version=`grep -oE  "[0-9.]+" /etc/redhat-release | cut -d . -f 1`
+    else
+        version=`grep -oE  "[0-9.]+" /etc/issue | cut -d . -f 1`
+    fi
+    bit=`uname -m`
+    if [[ ${bit} = "x86_64" ]]; then
+        bit="x64"
+    else
+        bit="x32"
+    fi
+}
+
+
+
+
+        
+    check_status(){
+    kernel_version=`uname -r | awk -F "-" '{print $1}'`
+    kernel_version_full=`uname -r`
+    net_congestion_control=`cat /proc/sys/net/ipv4/tcp_congestion_control | awk '{print $1}'`
+    net_qdisc=`cat /proc/sys/net/core/default_qdisc | awk '{print $1}'`
+    kernel_version_r=`uname -r | awk '{print $1}'`
+    # if [[ ${kernel_version_full} = "4.14.182-bbrplus" || ${kernel_version_full} = "4.14.168-bbrplus" || ${kernel_version_full} = "4.14.98-bbrplus" || ${kernel_version_full} = "4.14.129-bbrplus" || ${kernel_version_full} = "4.14.160-bbrplus" || ${kernel_version_full} = "4.14.166-bbrplus" || ${kernel_version_full} = "4.14.161-bbrplus" ]]; then
+    if [[ ${kernel_version_full} == *bbrplus* ]]; then
+        kernel_status="BBRplus"
+    # elif [[ ${kernel_version} = "3.10.0" || ${kernel_version} = "3.16.0" || ${kernel_version} = "3.2.0" || ${kernel_version} = "4.4.0" || ${kernel_version} = "3.13.0"  || ${kernel_version} = "2.6.32" || ${kernel_version} = "4.9.0" || ${kernel_version} = "4.11.2" || ${kernel_version} = "4.15.0" ]]; then
+        # kernel_status="Lotserver" 
+    elif [[ ${kernel_version_full} == *4.9.0-4* || ${kernel_version_full} == *4.15.0-30* || ${kernel_version_full} == *4.8.0-36* || ${kernel_version_full} == *3.16.0-77* || ${kernel_version_full} == *3.16.0-4* || ${kernel_version_full} == *3.2.0-4* || ${kernel_version_full} == *4.11.2-1* || ${kernel_version_full} == *2.6.32-504* || ${kernel_version_full} == *4.4.0-47* || ${kernel_version_full} == *3.13.0-29 || ${kernel_version_full} == *4.4.0-47* ]]; then
+        kernel_status="Lotserver"
+    elif [[ `echo ${kernel_version} | awk -F'.' '{print $1}'` == "4" ]] && [[ `echo ${kernel_version} | awk -F'.' '{print $2}'` -ge 9 ]] || [[ `echo ${kernel_version} | awk -F'.' '{print $1}'` == "5" ]]; then
+        kernel_status="BBR"
+    else 
+        kernel_status="noinstall"
+    fi
+    
+
+    if [[ ${kernel_status} == "BBR" ]]; then
+        run_status=`cat /proc/sys/net/ipv4/tcp_congestion_control | awk '{print $1}'`
+        if [[ ${run_status} == "bbr" ]]; then
+            run_status=`cat /proc/sys/net/ipv4/tcp_congestion_control | awk '{print $1}'`
+            if [[ ${run_status} == "bbr" ]]; then
+                run_status="BBR启动成功"
+            else 
+                run_status="BBR启动失败"
+            fi
+        elif [[ ${run_status} == "bbr2" ]]; then
+            run_status=`cat /proc/sys/net/ipv4/tcp_congestion_control | awk '{print $1}'`
+            if [[ ${run_status} == "bbr2" ]]; then
+                run_status="BBR2启动成功"
+            else 
+                run_status="BBR2启动失败"
+            fi  
+        elif [[ ${run_status} == "tsunami" ]]; then
+            run_status=`lsmod | grep "tsunami" | awk '{print $1}'`
+            if [[ ${run_status} == "tcp_tsunami" ]]; then
+                run_status="BBR魔改版启动成功"
+            else 
+                run_status="BBR魔改版启动失败"
+            fi
+        elif [[ ${run_status} == "nanqinlang" ]]; then
+            run_status=`lsmod | grep "nanqinlang" | awk '{print $1}'`
+            if [[ ${run_status} == "tcp_nanqinlang" ]]; then
+                run_status="暴力BBR魔改版启动成功"
+            else 
+                run_status="暴力BBR魔改版启动失败"
+            fi
+        else 
+            run_status="未安装加速模块"
+        fi
+        
+    elif [[ ${kernel_status} == "Lotserver" ]]; then
+        if [[ -e /appex/bin/lotServer.sh ]]; then
+            run_status=`bash /appex/bin/lotServer.sh status | grep "LotServer" | awk  '{print $3}'`
+            if [[ ${run_status} = "running!" ]]; then
+                run_status="启动成功"
+            else 
+                run_status="启动失败"
+            fi
+        else 
+            run_status="未安装加速"
+        fi  
+    elif [[ ${kernel_status} == "BBRplus" ]]; then
+        run_status=`cat /proc/sys/net/ipv4/tcp_congestion_control | awk '{print $1}'`
+        if [[ ${run_status} == "bbrplus" ]]; then
+            run_status=`cat /proc/sys/net/ipv4/tcp_congestion_control | awk '{print $1}'`
+            if [[ ${run_status} == "bbrplus" ]]; then
+                run_status="BBRplus启动成功"
+            else 
+                run_status="BBRplus启动失败"
+            fi
+        elif [[ ${run_status} == "bbr" ]]; then
+                run_status="BBR启动成功"    
+        else 
+            run_status="未安装加速模块"
+        fi
+    fi
+}
+
+
+
 bbr(){
 
 if uname -r|grep -q "^5."
@@ -278,9 +380,18 @@ ${Green_font_prefix}3.${Font_color_suffix} 开启内核转发
 ${Green_font_prefix}4.${Font_color_suffix} 系统资源限制调优
 ${Green_font_prefix}5.${Font_color_suffix} 屏蔽ICMP ${Green_font_prefix}6.${Font_color_suffix} 开放ICMP
 "
-get_system_info
-echo -e "当前系统信息: ${Font_color_suffix}$opsy ${Green_font_prefix}$virtual${Font_color_suffix} $arch ${Green_font_prefix}$kern${Font_color_suffix}
-"
+
+check_status
+    get_system_info
+    echo -e " 系统及内核: ${Font_color_suffix}$opsy ${Green_font_prefix}$virtual${Font_color_suffix} $arch ${Green_font_prefix}$kern${Font_color_suffix}"
+    if [[ ${kernel_status} == "noinstall" ]]; then
+        echo -e " 当前状态: ${Green_font_prefix}未安装${Font_color_suffix} 加速内核 ${Red_font_prefix}请先安装内核${Font_color_suffix}"
+    else
+        echo -e " 当前状态: ${Green_font_prefix}已安装${Font_color_suffix} ${_font_prefix}${kernel_status}${Font_color_suffix} 加速内核 , ${Green_font_prefix}${run_status}${Font_color_suffix}"
+        
+    fi
+    echo -e " 当前拥塞控制算法为: ${Green_font_prefix}${net_congestion_control}${Font_color_suffix} 当前队列算法为: ${Green_font_prefix}${net_qdisc}${Font_color_suffix} "
+
 
   read -p "请输入数字 :" num
   case "$num" in
