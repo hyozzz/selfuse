@@ -42,9 +42,9 @@ sed -i '/net.ipv4.tcp_thin_linear_timeouts/d' /etc/sysctl.conf
 sed -i '/net.ipv4.tcp_fastopen/d' /etc/sysctl.conf
 sed -i '/kernel.printk/d' /etc/sysctl.conf
 sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
-sed -i 'net.ipv6.conf.all.disable_ipv6 = 1' /etc/sysctl.conf
-sed -i 'net.ipv6.conf.default.disable_ipv6 = 1' /etc/sysctl.conf
-sed -i 'net.ipv6.conf.lo.disable_ipv6 = 1' /etc/sysctl.conf
+sed -i 'net.ipv6.conf.all.disable_ipv6/d' /etc/sysctl.conf
+sed -i 'net.ipv6.conf.default.disable_ipv6/d' /etc/sysctl.conf
+sed -i 'net.ipv6.conf.lo.disable_ipv6/d' /etc/sysctl.conf
 cat >> /etc/sysctl.conf << EOF
 #!!! Do not change these settings unless you know what you are doing !!!
 vm.swappiness = 10
@@ -69,6 +69,9 @@ net.ipv6.conf.default.disable_ipv6 = 1
 net.ipv6.conf.lo.disable_ipv6 = 1
 EOF
 sysctl -p && sysctl --system
+echo -e "${Info}TCP窗口调优(开启BBRFQ)完成，即将返回菜单"
+sleep 2s
+clear
 menu
 }
 
@@ -84,6 +87,9 @@ net.ipv4.conf.all.forwarding=1
 net.ipv4.conf.default.forwarding=1
 EOF
 sysctl -p && sysctl --system
+echo -e "${Info}开启内核转发完成,即将返回菜单"
+sleep 2s
+clear
 menu
 }
 
@@ -95,12 +101,18 @@ net.ipv4.icmp_echo_ignore_all=1
 net.ipv4.icmp_echo_ignore_broadcasts=1
 EOF
 sysctl -p && sysctl --system
+echo -e "${Info}屏蔽ICMP完成,即将返回菜单"
+sleep 2s
+clear
 menu
 }
 unbanping(){
 sed -i "s/net.ipv4.icmp_echo_ignore_all=1/net.ipv4.icmp_echo_ignore_all=0/g" /etc/sysctl.conf
 sed -i "s/net.ipv4.icmp_echo_ignore_broadcasts=1/net.ipv4.icmp_echo_ignore_broadcasts=0/g" /etc/sysctl.conf
 sysctl -p && sysctl --system
+echo -e "${Info}解除屏蔽ICMP完成,即将返回菜单"
+sleep 2s
+clear
 menu
 }
 
