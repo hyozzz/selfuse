@@ -174,6 +174,8 @@ DefaultLimitNPROC=65535
 EOF
 
 systemctl daemon-reload
+echo -e "${Info}系统资源限制调优完成,即将返回菜单"
+sleep 2s
 menu
 }
 
