@@ -34,6 +34,13 @@ sed -i '/net.core.wmem_max/d' /etc/sysctl.conf
 sed -i '/net.ipv4.udp_rmem_min/d' /etc/sysctl.conf
 sed -i '/net.ipv4.udp_wmem_min/d' /etc/sysctl.conf
 sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
+sed -i '/vm.swappiness/d' /etc/sysctl.conf
+sed -i '/fs.file-max/d' /etc/sysctl.conf
+sed -i '/net.ipv4.ip_forward/d' /etc/sysctl.conf
+sed -i '/net.ipv4.tcp_slow_start_after_idle/d' /etc/sysctl.conf
+sed -i '/net.ipv4.tcp_thin_linear_timeouts/d' /etc/sysctl.conf
+sed -i '/net.ipv4.tcp_fastopen/d' /etc/sysctl.conf
+sed -i '/kernel.printk/d' /etc/sysctl.conf
 sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
 sed -i 'net.ipv6.conf.all.disable_ipv6 = 1' /etc/sysctl.conf
 sed -i 'net.ipv6.conf.default.disable_ipv6 = 1' /etc/sysctl.conf
